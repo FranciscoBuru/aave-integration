@@ -17,15 +17,11 @@ Tests for the Aave implementation of the contract.
 def test_deploy():
     if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
         pytest.skip()
-    contract = deploy_contract()
-    assert (
-        contract.stableAddress()
-        == config["networks"][network.show_active()]["usdt-address"]
-    )
-    assert (
-        contract.aTokenContract() == config["networks"][network.show_active()]["a-usdt"]
-    )
-    assert contract.aavePool() == config["networks"][network.show_active()]["aave-pool"]
+    usdt, atoken, pool = deploy_mocks()
+    contract = deploy_contract(pool, usdt, atoken)
+    assert contract.stableAddress() == usdt
+    assert contract.aTokenContract() == atoken
+    assert contract.aavePool() == pool
 
 
 def test_deploy_mocks():
@@ -43,13 +39,15 @@ def test_mocks_mint_on_deposit():
         pytest.skip()
     account = get_account()
     usdt, atoken, pool = test_deploy_mocks()
-    tx = usdt.approve(pool, 10**18, {"from": account})
+    tx = usdt.approve(pool, Web3.toWei(1, "ether"), {"from": account})
     tx.wait(1)
-    tx = pool.supply(usdt, 10**18, account.address, 0, {"from": account})
+    tx = pool.supply(
+        usdt, Web3.toWei(1, "ether"), account.address, 0, {"from": account}
+    )
     tx.wait(1)
-    assert pool.contractBalance() == 10**18
-    assert atoken.balanceOf(account.address) == 10**18
-    assert usdt.balanceOf(account.address) == 99 * 10**18
+    assert pool.contractBalance() == Web3.toWei(1, "ether")
+    assert atoken.balanceOf(account.address) == Web3.toWei(1, "ether")
+    assert usdt.balanceOf(account.address) == Web3.toWei(99, "ether")
     return usdt, atoken, pool
 
 
@@ -60,11 +58,71 @@ def test_mocks_burn_on_withdrawal():
     usdt, atoken, pool = test_mocks_mint_on_deposit()
     ##The next line should not be done in real life but given that we are
     # mocking we have to. Yolo
-    tx = atoken.approve(pool, 10**18, {"from": account})
+    tx = atoken.approve(pool, Web3.toWei(1, "ether"), {"from": account})
     tx.wait(1)
     # Now the real deal
-    tx = pool.withdraw(usdt, (10**18) / 2, account.address)
-    assert pool.contractBalance() == (10**18) / 2
-    assert atoken.balanceOf(account.address) == (10**18) / 2
-    assert usdt.balanceOf(account.address) == 99 * 10**18 + (10**18) / 2
-    assert usdt.balanceOf(pool) == (10**18) / 2
+    tx = pool.withdraw(usdt, Web3.toWei(0.5, "ether"), account.address)
+    assert pool.contractBalance() == Web3.toWei(0.5, "ether")
+    assert atoken.balanceOf(account.address) == Web3.toWei(0.5, "ether")
+    assert usdt.balanceOf(account.address) == Web3.toWei(99.5, "ether")
+    assert usdt.balanceOf(pool) == Web3.toWei(0.5, "ether")
+
+
+def test_deposit_to_contract():
+    if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+        pytest.skip()
+    account = get_account()
+    account2 = get_account(index=2)
+    usdt, atoken, pool = deploy_mocks()
+    contract = deploy_contract(pool, usdt, atoken)
+    tx = usdt.transfer(account2, Web3.toWei(10, "ether"), {"from": account})
+    tx.wait(1)
+    tx = usdt.approve(contract, Web3.toWei(5, "ether"), {"from": account2})
+    tx.wait(1)
+    tx = contract.depositToContract(Web3.toWei(5, "ether"), usdt, {"from": account2})
+    tx.wait(1)
+    assert contract.contractBalance() == Web3.toWei(5, "ether")
+    assert contract.depositedAmount(account2) == Web3.toWei(5, "ether")
+    assert usdt.balanceOf(account2.address) == Web3.toWei(5, "ether")
+    return usdt, atoken, pool, contract
+
+
+def test_supply_to_pool_owner():
+    if network.show_active() not in LOCAL_BLOCKCHAIN_ENVIRONMENTS:
+        pytest.skip()
+    account = get_account()
+    usdt, atoken, pool, contract = test_deposit_to_contract()
+    tx = contract.supplyToPool(Web3.toWei(1, "ether"), {"from": account})
+    tx.wait(1)
+    assert atoken.balanceOf(contract) == Web3.toWei(1, "ether")
+    assert usdt.allowance(account, contract) == 0
+    assert pool.contractBalance() == Web3.toWei(1, "ether")
+    assert usdt.balanceOf(pool) == Web3.toWei(1, "ether")
+    return usdt, atoken, pool, contract
+
+
+def test_withdraw_part_from_pool_owner():
+    account = get_account()
+    usdt, atoken, pool, contract = test_supply_to_pool_owner()
+    tx = contract.withdrawFromPool(Web3.toWei(0.5, "ether"), {"from": account})
+    tx.wait(1)
+    assert atoken.balanceOf(contract) == Web3.toWei(0.5, "ether")
+    assert usdt.allowance(account, contract) == 0
+    assert pool.contractBalance() == Web3.toWei(0.5, "ether")
+    assert usdt.balanceOf(pool) == Web3.toWei(0.5, "ether")
+    assert usdt.balanceOf(contract) == Web3.toWei(4.5, "ether")
+    assert usdt.balanceOf(account.address) == Web3.toWei(90, "ether")
+
+
+def test_withdraw_full_from_pool_owner():
+    account = get_account()
+    usdt, atoken, pool, contract = test_supply_to_pool_owner()
+    tx = contract.withdrawFromPool(Web3.toWei(1, "ether"), {"from": account})
+    tx.wait(1)
+    assert atoken.balanceOf(contract) == Web3.toWei(0.0, "ether")
+    assert usdt.allowance(account, contract) == 0
+    assert pool.contractBalance() == Web3.toWei(0.0, "ether")
+    assert usdt.balanceOf(pool) == Web3.toWei(0.0, "ether")
+    assert usdt.balanceOf(contract) == Web3.toWei(5, "ether")
+    assert usdt.balanceOf(account.address) == Web3.toWei(90, "ether")
+    assert contract.contractBalance() == Web3.toWei(5, "ether")

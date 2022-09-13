@@ -29,14 +29,15 @@ contract PoolMock {
         address asset,
         uint256 amount,
         address to
-    ) public {
+    ) public returns (uint256) {
         require(asset == stableAddress, "Invalid ERC20");
         require(
             amount <= aTokenContract.balanceOf(msg.sender),
             "Insufficient funds in contract"
         );
         aTokenContract.burn(msg.sender, amount);
-        IERC20(stableAddress).transfer(msg.sender, amount);
+        IERC20(stableAddress).transfer(to, amount);
         contractBalance -= amount;
+        return contractBalance;
     }
 }

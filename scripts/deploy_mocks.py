@@ -10,7 +10,7 @@ from brownie import (
 from web3 import Web3
 from scripts.helpful_scripts import LOCAL_BLOCKCHAIN_ENVIRONMENTS, get_account
 
-SUPPLY = 100 * (10**18)
+SUPPLY = Web3.toWei(100, "ether")
 
 
 def main():

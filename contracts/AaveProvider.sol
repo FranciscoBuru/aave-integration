@@ -17,7 +17,7 @@ contract AaveProvider is Ownable {
     //aave pool interface
     IPool public aavePool;
 
-    //Balance that the contract has in stablecoins
+    //Balance of stable token in contract
     uint256 public contractBalance;
 
     //Maps address to stable amount deposited to contract
@@ -59,6 +59,7 @@ contract AaveProvider is Ownable {
 
     function supplyToPool(uint256 _amount) public onlyOwner {
         require(_amount <= contractBalance, "Insufficient funds in contract");
+        IERC20(stableAddress).approve(address(aavePool), _amount);
         aavePool.supply(stableAddress, _amount, address(this), 0);
         contractBalance -= _amount;
     }
@@ -73,24 +74,12 @@ contract AaveProvider is Ownable {
     function withdrawFromPool(uint256 _amount) public onlyOwner {
         require(
             _amount <= aTokenContract.balanceOf(address(this)),
-            "Insufficient funds in pool"
+            "Insufficient aTokens"
         );
+        //Quita lo siguiente
+        //aTokenContract.approve(address(aavePool), _amount);
         aavePool.withdraw(stableAddress, _amount, address(this));
         contractBalance += _amount;
-    }
-
-    /**
-        @dev Lets contract owner withdraw the max amount from pool
-
-        Requirements:
-            - '_amount' has to be lees or equal to the amount previously 
-            deposited. 
-     */
-    function withdrawMaxFromPool() public onlyOwner {
-        uint256 balance = aTokenContract.balanceOf(address(this));
-        require(balance > 0);
-        aavePool.withdraw(stableAddress, type(uint256).max, address(this));
-        contractBalance += balance;
     }
 }
 
