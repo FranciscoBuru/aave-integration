@@ -1,0 +1,35 @@
+dependencies:
+  #- <organization/repo>@<version>
+  - OpenZeppelin/openzeppelin-contracts@4.5.0
+  - smartcontractkit/chainlink@1.4.1
+  - aave/aave-v3-core@1.16.2
+
+compiler:
+  solc:
+    remappings:
+      - "@openzeppelin=OpenZeppelin/openzeppelin-contracts@4.5.0"
+      - "@aave=aave/aave-v3-core@1.16.2"
+dotenv: .env
+networks:
+  default: development
+  development:
+    verify: False
+    aave-pool: "0x368EedF3f56ad10b9bC57eed4Dac65B26Bb667f6"
+    usdt-address: "0xC2C527C0CACF457746Bd31B2a698Fe89de2b6d49"
+    a-usdt: "0x73258E6fb96ecAc8a979826d503B45803a382d68"
+  rinkeby:
+    verify: True
+  mainnet-fork:
+    verify: False
+  ganache-local:
+    verify: False
+  goerli:
+    verify: True
+    aave-pool: "0x368EedF3f56ad10b9bC57eed4Dac65B26Bb667f6"
+    usdt-address: "0xC2C527C0CACF457746Bd31B2a698Fe89de2b6d49"
+    a-usdt: "0x73258E6fb96ecAc8a979826d503B45803a382d68"
+settings:
+  gas_limit: "100000000000"
+wallets:
+  from_key: ${PRIVATE_KEY}
+  from_key1: ${PRIVATE_KEY2}

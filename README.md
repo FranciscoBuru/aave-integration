@@ -1,0 +1,24 @@
+# ETHOnline Project
+
+## Aave integration tests
+
+Testing integration of Aave into the protocol.
+
+# Environment setup
+
+- Get vscode
+- Place the solidity and python extensions
+- Get Python 3
+- install node v. 16.xx.xx
+- install ganache-cli using npm
+- install brownie using pip
+- Solve the problems you encounter
+- Voila
+
+# Running tests
+
+`$ brownie test`
+
+# Disclaimer
+
+Mocks don't really reproduce the dynamics of an aToken but they are good enough for testing what we want.
