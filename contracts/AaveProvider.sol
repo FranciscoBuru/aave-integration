@@ -44,6 +44,10 @@ contract AaveProvider is Ownable {
      */
     function depositToContract(uint256 _amount, address _tokenAddress) public {
         require(_tokenAddress == stableAddress, "Invalid ERC20");
+        require(
+            IERC20(stableAddress).allowance(msg.sender, address(this)) >=
+                _amount
+        );
         IERC20(stableAddress).transferFrom(msg.sender, address(this), _amount);
         depositedAmount[msg.sender] = _amount;
         contractBalance += _amount;
