@@ -15,8 +15,7 @@ from scripts.helpful_scripts import LOCAL_BLOCKCHAIN_ENVIRONMENTS, get_account
 
 
 def main():
-    deploy_child()
-    get_community()
+    approve()
 
 
 def create_community():
@@ -42,7 +41,7 @@ def get_community():
     tx = usdt.approve(community, amount, {"from": get_account(number=0)})
     tx.wait(1)
     tx = community.depositt(
-        Web3.toWei(0.00001, "ether"),
+        Web3.toWei(0.01, "ether"),
         1,
         1,
         1,
@@ -60,3 +59,15 @@ def deploy_child():
         "0xE70d62cB33A77E4045E8d6D4896Efdd346E5d5F4",
         {"from": account, "allow_revert": True},
     )
+
+
+def approve():
+    usdt = USDTMock[0]
+    community = Child[-1]
+    amount = Web3.toWei(2000, "ether")
+    tx = usdt.approve(
+        "0x41Dc5c8de461b7dcaD5a0044C0F1F69Af4d90Ab1",
+        amount,
+        {"from": get_account(number=0)},
+    )
+    tx.wait(1)
