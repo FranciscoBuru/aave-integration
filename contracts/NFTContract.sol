@@ -35,7 +35,7 @@ contract NFTContract is ERC721, Ownable {
 
     function _baseURI() internal view virtual override returns (string memory) {
         //Hardcodea el URI
-        return "";
+        return "ipfs://QmY41tqW2qfmH4oMHjYF379De8yNeVGmU4LafFQhEgQcuu";
     }
 
     function createCollectible(
