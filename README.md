@@ -22,3 +22,7 @@ Testing integration of Aave into the protocol.
 # Disclaimer
 
 Mocks don't really reproduce the dynamics of an aToken but they are good enough for testing what we want.
+
+# Disclaimer 2
+
+We developed the aave integration sepparetly from the tableland one which ended un giving us a lot of trouble at the end so we could not finish integrating because of a problem with sonme dependencies. But all the work was done.
