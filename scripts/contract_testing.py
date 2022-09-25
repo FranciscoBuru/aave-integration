@@ -24,23 +24,23 @@ def create_community():
 
 
 def get_community():
-    community = Child[-1]
-    tx = community.addUnit(
-        1,
-        "hola",
-        "0x7f98B625eA17fA2F841ff6D92bb1f6c0ae07EBe5",
-        {"from": get_account(number=0)},
-    )
+    community = Child[-2]
+    #tx = community.addUnit(
+    #    1,
+    #    "hola",
+    #    "0x7f98B625eA17fA2F841ff6D92bb1f6c0ae07EBe5",
+    #    {"from": get_account(number=0)},
+    #)
     tx = community.deployNFTs({"from": get_account(number=0)})
-    tx.wait(1)
-    usdt = USDTMock[0]
-    pool = PoolMock[0]
+    #tx.wait(1)
+    #usdt = USDTMock[0]
+    #pool = PoolMock[0]
 
-    amount = Web3.toWei(100, "ether")
-    network.gas_limit(1000000)
-    tx = usdt.approve(community, amount, {"from": get_account(number=0)})
-    tx.wait(1)
-    tx = community.depositt(
+    #amount = Web3.toWei(100, "ether")
+    #network.gas_limit(1000000)
+    #tx = usdt.approve(community, amount, {"from": get_account(number=0)})
+    #tx.wait(1)
+    #tx = community.depositt(
         Web3.toWei(0.01, "ether"),
         1,
         1,
