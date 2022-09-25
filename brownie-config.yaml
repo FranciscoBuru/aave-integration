@@ -1,6 +1,7 @@
 dependencies:
   #- <organization/repo>@<version>
   - OpenZeppelin/openzeppelin-contracts@4.5.0
+  - OpenZeppelin/openzeppelin-contracts-upgradeable@4.7.3
   - aave/aave-v3-core@1.16.2
   - tablelandnetwork/evm-tableland@2.0.4
 
