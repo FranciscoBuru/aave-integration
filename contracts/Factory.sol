@@ -20,6 +20,8 @@ contract Factory is ERC721Holder, Ownable {
 
     address internal _registry = 0x4b48841d4b32C4650E4ABc117A03FE8B51f38F68; //Polygon Mumbai
 
+    event ChildCreated(address child);
+
     constructor() payable {
         /* _tableland = ITablelandTables(_registry); */
         _counterCom = 1000; //we initialize the counter
@@ -115,10 +117,11 @@ contract Factory is ERC721Holder, Ownable {
     } */
 
     //Generate new contract to the new community
-    function generateChild(uint256 _community) internal returns (address) {
+    function generateChild(uint256 _community) public returns (address) {
         Child comm = new Child(_community, address(this));
         communitiesInContract.push(comm);
         comm.transferOwnership(msg.sender);
+        emit ChildCreated(address(comm));
         return address(comm);
     }
 

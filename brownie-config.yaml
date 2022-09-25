@@ -1,7 +1,6 @@
 dependencies:
   #- <organization/repo>@<version>
   - OpenZeppelin/openzeppelin-contracts@4.5.0
-  - OpenZeppelin/openzeppelin-contracts-upgradeable@4.7.3
   - aave/aave-v3-core@1.16.2
   - tablelandnetwork/evm-tableland@2.0.4
 
@@ -30,6 +29,13 @@ networks:
     aave-pool: "0x368EedF3f56ad10b9bC57eed4Dac65B26Bb667f6"
     usdt-address: "0xC2C527C0CACF457746Bd31B2a698Fe89de2b6d49"
     a-usdt: "0x73258E6fb96ecAc8a979826d503B45803a382d68"
+  mumbai:
+    verify: True
+    aave-pool: "0xf368fF03831Accc37BEe8461523560f06918faEd"
+    usdt-address: "0x7b4Bf48b219765392A839D6a47178A3633d412a0"
+    a-usdt: "0x1E7DEb5E5b6D92D8C51312C15Fa50d9b8AE76F1A"
+    factory: "0xAC5D889A187CDcDB4CCE75411eFe4E90054114fE"
+    community: "0xb2268801aEE843b264EbBc57C8556eEf6024f862"
 settings:
   gas_limit: "100000000000"
 wallets:

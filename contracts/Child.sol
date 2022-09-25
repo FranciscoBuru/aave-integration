@@ -27,19 +27,19 @@ contract Child is ERC721Holder, Ownable {
 
     //ITablelandTables internal _tableland;
     // Variables Tabla Units(Casas)
-    string internal tableNameUnit;
+    string public tableNameUnit;
     uint256 internal _tableIdUnit;
     uint256 internal counterUnit;
     // Variables Tabla Payments
-    string internal tableNamePay;
+    string public tableNamePay;
     uint256 internal _tableIdPay;
     uint256 internal counterPay;
     // Variables Tabla Suppliers
-    string internal tableNameSup;
+    string public tableNameSup;
     uint256 internal _tableIdSup;
     uint256 internal counterSup;
     // Variables Tabla Suppliers Payments
-    string internal tableNameSP;
+    string public tableNameSP;
     uint256 internal _tableIdSP;
     uint256 internal counterSP;
 
@@ -68,13 +68,15 @@ contract Child is ERC721Holder, Ownable {
         counterPay = 1;
         counterSup = 1;
         counterSP = 1;
+        counterUnit = 1;
 
         // Aave hardcoded
-        aavePool = IPool(0x6C9fB0D5bD9429eb9Cd96B85B81d872281771E6B);
-        aTokenContract = IAToken(0x6Ca4abE253bd510fCA862b5aBc51211C1E1E8925);
-        stableAddress = 0xA02f6adc7926efeBBd59Fd43A84f4E0c0c91e832;
+        aavePool = IPool(0xf368fF03831Accc37BEe8461523560f06918faEd);
+        aTokenContract = IAToken(0x1E7DEb5E5b6D92D8C51312C15Fa50d9b8AE76F1A);
+        stableAddress = 0x7b4Bf48b219765392A839D6a47178A3633d412a0;
+    }
 
-        //NFT
+    function deployNFTs() public onlyOwner {
         paymentReceipt = new NFTContract();
     }
 
@@ -178,7 +180,7 @@ contract Child is ERC721Holder, Ownable {
         string memory _name,
         address _ownerW
     ) external payable {
-        Units[_ownerW] = _num;
+        Units[msg.sender] = _num;
 
         /* _tableland.runSQL(
             address(this), //revisar si es esta address o tienes que ser la del padre
@@ -200,14 +202,15 @@ contract Child is ERC721Holder, Ownable {
         counterUnit++;
     }
 
-    function deposit(
-        uint256 _unit,
+    function depositt(
         uint256 _fee,
-        uint256 _year,
-        uint256 _month
-    ) public payable requireMember {
+        uint256 _unit,
+        uint256 _month,
+        uint256 _year
+    ) public {
         require(
-            IERC20(stableAddress).allowance(msg.sender, address(this)) >= _fee
+            IERC20(stableAddress).allowance(msg.sender, address(this)) >= _fee,
+            "needs approval"
         );
         IERC20(stableAddress).transferFrom(msg.sender, address(this), _fee);
         depositedAmount[msg.sender] = _fee;
@@ -234,17 +237,9 @@ contract Child is ERC721Holder, Ownable {
                 ", 1)"
             )
         ); */
-        counterPay++;
+        //counterPay++;
 
-        generateNFT(_unit, _year, _month);
-    }
-
-    function generateNFT(
-        uint256 _unit,
-        uint256 _year,
-        uint256 _month
-    ) internal returns (bool) {
-        paymentReceipt.createCollectible(msg.sender, _year, _month, _unit);
+        paymentReceipt.createCollectible(msg.sender);
     }
 
     // This function have to be from frontend with the tableland API
@@ -287,12 +282,12 @@ contract Child is ERC721Holder, Ownable {
         return address(this).balance;
     }
 
-    function suplierPaymen(
+    function suplierPayme(
         uint256 _idSup,
         uint256 _amount,
         uint256 _year,
         uint256 _month
-    ) external {
+    ) external onlyOwner {
         require(address(this).balance > _amount, "Not enough money!!");
 
         address supWallet = Supliers[_idSup];

@@ -6,14 +6,13 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract NFTContract is ERC721, Ownable {
+contract NFTContract is ERC721 {
     uint256 public tokenCounter;
-    uint256[] public year;
-    uint256[] public month;
-    uint256[] public unit;
+    address public owner;
 
     constructor() ERC721("PaymentNFT", "PNFT") {
         tokenCounter = 0;
+        owner = msg.sender;
     }
 
     function tokenURI(uint256 tokenId)
@@ -28,9 +27,7 @@ contract NFTContract is ERC721, Ownable {
             "ERC721Metadata: URI query for nonexistent token"
         );
 
-        string memory baseURI = _baseURI();
-        return
-            bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI)) : "";
+        return string(abi.encodePacked(_baseURI()));
     }
 
     function _baseURI() internal view virtual override returns (string memory) {
@@ -38,17 +35,10 @@ contract NFTContract is ERC721, Ownable {
         return "ipfs://QmY41tqW2qfmH4oMHjYF379De8yNeVGmU4LafFQhEgQcuu";
     }
 
-    function createCollectible(
-        address _destination,
-        uint256 _year,
-        uint256 _month,
-        uint256 _unit
-    ) public onlyOwner {
+    function createCollectible(address destination) public {
+        require(msg.sender == owner);
         uint256 newTokenId = tokenCounter;
-        _safeMint(_destination, newTokenId);
-        year[tokenCounter] = _year;
-        month[tokenCounter] = _month;
-        unit[tokenCounter] = _unit;
+        _mint(destination, newTokenId);
         tokenCounter = tokenCounter + 1;
     }
 }

@@ -1,0 +1,11 @@
+{
+    "name": "Payment receipt",
+    "description": "NFT minted after payment in TrustedSphere",
+    "image": "ipfs://QmTaHdr4SXKdSoLyMntvx4S6CHTdiC11qFjG8WKe9t54xw",
+    "attributes": [
+      {
+        "trait_type": "Payment",
+        "value": "It happened"
+      }
+    ]
+  }
